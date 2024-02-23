@@ -1,6 +1,6 @@
 {
   "name": "kaif",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A lightweight and efficient alternative to React tailored to build fast and interactive web applications with small footprint",
   "main": "dist/index.mjs",
   "scripts": {

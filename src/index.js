@@ -54,7 +54,11 @@ const init = ($el, fn) => {
       }
 
       if (key.indexOf('on') != 0) {
-        $el[key] = tmp
+        if (typeof tmp == 'object') {
+          Object.assign($el[key], tmp)
+        } else {
+          $el[key] = tmp
+        }
       } else {
         $el.addEventListener(
           key.substring(2),

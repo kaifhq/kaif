@@ -16,7 +16,7 @@ test('Lazy counter', () => {
       {
         elem: 'button',
         innerText: 'Increment',
-        onClick: () => count++,
+        onclick: async () => count++,
       },
     ]
   }

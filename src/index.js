@@ -1,17 +1,17 @@
-const init = ($el, fn) => {
-  let prevTree = {$el, elem: $el.nodeName.toLowerCase()}, tmp
+const init = ($e, fn) => {
+  /* $e === $element, R === repaint, C === cleanup */
+  let prevTree = {$e, elem: $e.nodeName.toLowerCase()}, tmp, L = 'toLowerCase'
 
   const render = () => {
-    tmp = El(prevTree, fn(), $el)
+    tmp = El(prevTree, fn(), $e)
     deleteRecursive(prevTree)
     prevTree = tmp
   }
 
   const deleteRecursive = (oldTree) => {
     (oldTree.children??[]).map(deleteRecursive)
-    if (!oldTree.repaint) {
-      oldTree.$el.remove()
-      oldTree = null
+    if (!oldTree.R) {
+      oldTree = oldTree.$e.remove()
     }
   }
 
@@ -30,23 +30,23 @@ const init = ($el, fn) => {
 
     if (!prev || (tmp = prev.elem !== cur.elem)) {
       if (prev && tmp) deleteRecursive(prev)
-      cur.$el = document.createElement(cur.elem)
-      root.append(cur.$el)
+      cur.$e = document.createElement(cur.elem)
+      root.append(cur.$e)
     } else {
-      prev.repaint = true
-      cur.$el = prev.$el
-      cur.cleanup = prev.cleanup
+      prev.R = true
+      cur.$e = prev.$e
+      cur.C = prev.C
     }
 
     let {
-      $el, elem, children, cleanup, ...rest
+      $e, elem, children, C, ...rest
     } = cur
 
-    if (cleanup) for (let key in cleanup) {
-      $el.removeEventListener(key.substring(2), cur.cleanup[key])
+    if (C) for (let key in C) {
+      $e.removeEventListener(key.substring(2)[L](), cur.C[key])
     }
 
-    cur.cleanup = {}
+    cur.C = {}
 
     for (let key in rest) {
       if (typeof (tmp = rest[key]) == 'undefined') {
@@ -55,16 +55,18 @@ const init = ($el, fn) => {
 
       if (key.indexOf('on') != 0) {
         if (typeof tmp == 'object') {
-          Object.assign($el[key], tmp)
+          Object.assign($e[key], tmp)
         } else {
-          $el[key] = tmp
+          $e[key] = tmp
         }
       } else {
-        $el.addEventListener(
-          key.substring(2),
-          cur.cleanup[key] = e => {
+        $e.addEventListener(
+          key.substring(2)[L](),
+          cur.C[key] = e => {
             rest[key](e)
-            render()
+            if (key[2][L]() === key[2]) {
+              render()
+            }
           }
         )
       }
@@ -76,7 +78,7 @@ const init = ($el, fn) => {
         children: children.map((child, i) => El(
           prev && prev.children && prev.children[i],
           child,
-          $el
+          $e
         ))
       }
 

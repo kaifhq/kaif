@@ -1,5 +1,6 @@
+import { h, Fragment } from './jsx'
+
 const init = ($el, fn) => {
-  /* $el === $ellement */
   let prevTree = {$el, elem: $el.nodeName.toLowerCase()}, tmp
 
   const render = () => {
@@ -17,7 +18,7 @@ const init = ($el, fn) => {
 
   const El = (prev, cur, root) => {
     if (Array.isArray(cur)) {
-      cur = { children: cur }
+      cur = { children: cur, elem: Fragment }
     }
     if (
       typeof cur === 'string'
@@ -30,13 +31,19 @@ const init = ($el, fn) => {
 
     if (!prev || (tmp = prev.elem !== cur.elem)) {
       if (prev && tmp) deleteRecursive(prev)
-      cur.$el = document.createElement(cur.elem)
-      root.append(cur.$el)
+      if (cur.elem == Fragment) {
+        cur.$el = root
+      } else {
+        cur.$el = document.createElement(cur.elem)
+        root.append(cur.$el)
+      }
     } else {
       prev.repaint = true
       cur.$el = prev.$el
       cur.cleanup = prev.cleanup
     }
+
+
 
     let {
       $el, elem, children, cleanup, ...rest
@@ -90,5 +97,4 @@ const init = ($el, fn) => {
   return render
 }
 
-import { h, Fragment } from './jsx'
 export default { init, h, Fragment }

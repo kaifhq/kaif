@@ -25,7 +25,7 @@ test('Counter without jsx', () => {
     return {
       elem: 'div',
       id: 'root',
-      children: Counter(), 
+      children: [Counter()], 
     }
   }
 

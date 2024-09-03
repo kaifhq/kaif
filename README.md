@@ -57,7 +57,7 @@ const App = () => {
   return {
     elem: 'div',
     id: 'root',
-    children: Counter(), 
+    children: [Counter()], 
   }
 }
 

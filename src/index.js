@@ -44,7 +44,6 @@ const init = ($el, fn) => {
     }
 
 
-
     let {
       $el, elem, children, cleanup, ...rest
     } = cur

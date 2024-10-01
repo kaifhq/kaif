@@ -1,94 +1,122 @@
-import { h, Fragment } from './jsx'
+const functionKeyword = 'function'
+const childrenKeyword = 'children'
+const cleanupKeyword = 'clean'
+const Fragment = 'frag'
 
-const init = ($el, fn) => {
-  let prevTree = {$el, elem: $el.nodeName.toLowerCase()}, tmp
+const h = (elem, props, ...children) => {
+  if (typeof elem == functionKeyword) return elem({...props, [childrenKeyword]:children})
+  return { ...props, elem, [childrenKeyword]:children }
+}
 
-  const render = () => {
-    tmp = El(prevTree, fn(), $el)
-    deleteRecursive(prevTree)
-    prevTree = tmp
-  }
+// $ represents attached dom node
+const init = ($, fn) => {
+  let prevTree = {$, elem: $.nodeName.toLowerCase()}, tmp
 
   const deleteRecursive = (oldTree) => {
-    (oldTree.children??[]).map(deleteRecursive)
-    if (!oldTree.repaint) {
-      oldTree = oldTree.$el.remove()
+    for (let queue = [oldTree], t;t = queue.shift();) {
+      if (t[childrenKeyword]) {
+        queue = queue.concat(t[childrenKeyword])
+      }
+
+      if (!t.repaint) {
+        t = t.$.remove()
+      }
     }
   }
 
-  const El = (prev, cur, root) => {
-    if (Array.isArray(cur)) {
-      cur = { children: cur, elem: Fragment }
-    }
-    if (
-      typeof cur === 'string'
-      || typeof cur === 'number'
-    ) {
-      cur = { innerText: cur.toString() }
-    }
+  const render = () => {
+    let tree = null
 
-    cur.elem = cur.elem || 'span'
+    for (
+      let queue = [[prevTree, fn(), $]], o;
+      o = queue.shift();
+      ) {
+      let [prev, cur, root, father] = o
 
-    if (!prev || (tmp = prev.elem !== cur.elem)) {
-      if (prev && tmp) deleteRecursive(prev)
-      if (cur.elem == Fragment) {
-        cur.$el = root
-      } else {
-        cur.$el = document.createElement(cur.elem)
-        root.append(cur.$el)
+      if (Array.isArray(cur)) {
+        cur = { [childrenKeyword]: cur, elem: Fragment }
       }
-    } else {
-      prev.repaint = true
-      cur.$el = prev.$el
-      cur.cleanup = prev.cleanup
-    }
-
-
-    let {
-      $el, elem, children, cleanup, ...rest
-    } = cur
-
-    if (cleanup) for (let key in cleanup) {
-      $el.removeEventListener(key.substring(2), cur.cleanup[key])
-    }
-
-    cur.cleanup = {}
-
-    for (let key in rest) {
-      if (typeof (tmp = rest[key]) == 'undefined') {
-        continue
+      if (
+        ['string', 'number'].includes(typeof cur)
+      ) {
+        cur = { innerText: cur.toString() }
       }
 
-      if (key.indexOf('on') != 0) {
-        if (typeof tmp == 'object') {
-          Object.assign($el[key], tmp)
+      let curelem = cur.elem = cur.elem || 'span'
+
+      if (!prev || (tmp = prev.elem != curelem)) {
+        if (prev && tmp) deleteRecursive(prev)
+        if (curelem == Fragment) {
+          cur.$ = root
         } else {
-          $el[key] = tmp
+          cur.$ = document.createElement(curelem)
+          root.append(cur.$)
         }
       } else {
-        $el.addEventListener(
+        prev.repaint = true
+        cur.$ = prev.$
+        cur[cleanupKeyword] = prev[cleanupKeyword]
+      }
+
+
+      let {
+        $,
+        elem,
+        [childrenKeyword]:children,
+        [cleanupKeyword]:cleanup,
+        ...rest
+      } = cur
+
+      for (let key in cleanup || {}) {
+        $.removeEventListener(
           key.substring(2),
-          cur.cleanup[key] = e => {
-            let r = rest[key](e)
-            if (!(r && typeof r.then == 'function')) {
-              render()
-            }
-          }
+          cur[cleanupKeyword][key]
         )
+      }
+
+      cur[cleanupKeyword] = {}
+
+      for (let key in rest) {
+        if (typeof (tmp = rest[key]) == 'undefined') {
+          continue
+        }
+
+        if (key.indexOf('on') != 0) {
+          if (typeof tmp == 'object') {
+            Object.assign($[key], tmp)
+          } else {
+            $[key] = tmp
+          }
+        } else {
+          $.addEventListener(
+            key.substring(2),
+            cur[cleanupKeyword][key] = e =>
+              ((tmp = rest[key](e)) && typeof tmp.then == functionKeyword) || render()
+          )
+        }
+      }
+
+      if (children) {
+        children.map((child, i) => queue.push([
+          prev
+            && prev[childrenKeyword]
+            && prev[childrenKeyword][i],
+          child,
+          $,
+          cur,
+        ]))
+        cur[childrenKeyword] = []
+      }
+
+      if (father) {
+        father[childrenKeyword].push(cur)
+      } else {
+        tree = cur
       }
     }
 
-    if (children)
-      return {
-        ...cur,
-        children: children.map((child, i) => El(
-          prev && prev.children && prev.children[i],
-          child,
-          $el
-        ))
-      }
-
-    return cur
+    deleteRecursive(prevTree)
+    prevTree = tree
   }
 
   render()

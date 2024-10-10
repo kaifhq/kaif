@@ -4,8 +4,8 @@ const cleanupKeyword = 'clean'
 const Fragment = 'frag'
 
 const h = (elem, props, ...children) => {
-  if (typeof elem == functionKeyword) return elem({...props, [childrenKeyword]:children})
-  return { ...props, elem, [childrenKeyword]:children }
+  if (typeof elem == functionKeyword) return elem({[childrenKeyword]:children, ...props})
+  return { [childrenKeyword]:children, ...props, elem }
 }
 
 // $ represents attached dom node

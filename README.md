@@ -6,6 +6,8 @@ Kaif is a JavaScript library for building user interfaces.
 * Supports jsx
 * 100% test code coverage
 
+[using with shadcn/ui](https://github.com/kaifhq/kaif/blob/main/shadcn.md)
+
 ## Usage
 
 ```js

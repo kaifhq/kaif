@@ -1,7 +1,7 @@
 const functionKeyword = 'function'
 const childrenKeyword = 'children'
 const cleanupKeyword = 'clean'
-const Fragment = 'frag'
+const Fragment = ''
 
 const h = (elem, props, ...children) => {
   if (typeof elem == functionKeyword) return elem({[childrenKeyword]:children, ...props})
@@ -42,7 +42,7 @@ const init = ($, fn) => {
         cur = { innerText: cur.toString() }
       }
 
-      let curelem = cur.elem = cur.elem || 'span'
+      let curelem = cur.elem = cur.elem || Fragment
 
       if (!prev || (tmp = prev.elem != curelem)) {
         if (prev && tmp) deleteRecursive(prev)

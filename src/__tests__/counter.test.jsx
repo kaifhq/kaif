@@ -4,7 +4,7 @@ import Kaif from 'kaif'
 document.body.innerHTML = '<div id="root"></div>'
 
 const htmlWithNumber = (n) => 
-  `<div id="root"><h1><span>${n}</span></h1><button><span>Increment</span></button></div>`
+  `<div id="root"><h1>${n}</h1><button>Increment</button></div>`
 
 test('Counter', () => {
   let count = 0

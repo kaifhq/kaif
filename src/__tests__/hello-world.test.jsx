@@ -9,6 +9,6 @@ test('Hello world', () => {
   const component = Kaif.init(root, App)
 
   expect(document.body.innerHTML).toEqual(
-    '<div id="root"><span>Hello world</span></div>'
+    '<div id="root">Hello world</div>'
   )
 })

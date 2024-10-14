@@ -2,3 +2,4 @@ src
 vitest.config.js
 coverage
 bench.json
+shadcn.md

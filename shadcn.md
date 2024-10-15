@@ -6,6 +6,15 @@ This piece of text will guide you through using
 components of shadcn ui with kaif.
 Feel free to contribute.
 
+
+# Registry
+
+See how registry works by following those 3 example links:
+https://ui.shadcn.com/registry
+https://ui.shadcn.com/registry/styles/index.json
+https://ui.shadcn.com/registry/styles/default/card.json
+
+
 Componets are subdiveded into groups based on the
 support status.
 
